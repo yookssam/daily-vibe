@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2027대비 중등임용 체육 노트</title>
+  <title>2027대비 중등임용 체육 학습 노트</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <!-- Tailwind CSS & Lucide Icons -->
@@ -12,7 +12,7 @@
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     .card-hover { transition: all 0.2s ease-in-out; }
-    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1); }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3); }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col pb-20">
@@ -24,7 +24,7 @@
         <span class="bg-amber-500/20 text-amber-400 font-bold px-2.5 py-1 rounded text-sm border border-amber-500/30">
           중등임용 체육
         </span>
-        <h1 class="font-bold text-lg text-white tracking-tight"> 학습 노트 <span class="text-xs text-slate-400 font-normal">v1.0</span></h1>
+        <h1 class="font-bold text-lg text-white tracking-tight"> 학습 노트 <span class="text-xs text-slate-400 font-normal">v1.1</span></h1>
       </div>
       <button id="installBtn" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition">
         <i data-lucide="download" class="w-4 h-4"></i> 앱 설치
@@ -34,11 +34,32 @@
 
   <main class="max-w-5xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
 
-    <!-- 통합 검색바 -->
-    <div class="relative">
-      <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
-      <input type="text" id="searchInput" placeholder="키워드로 문제 및 정답 검색 (예: 젖산역치, 모스턴, 반두라)"
-        class="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-100 placeholder-slate-400">
+    <!-- 키워드 및 과목 필터 검색바 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="md:col-span-2 relative">
+        <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
+        <input type="text" id="searchInput" placeholder="키워드로 문제 및 정답 검색 (예: 젖산역치, 모스턴, 타일러)"
+          class="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-100 placeholder-slate-400">
+      </div>
+      <div>
+        <select id="subjectFilter" onchange="filterBySubject(this.value)" class="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-100 cursor-pointer">
+          <option value="ALL">전체 과목 보기</option>
+          <option value="일반교육학">📄 일반교육학</option>
+          <option value="체육교육과정">⚽ 체육교육과정</option>
+          <option value="체육교육론1">⚽ 체육교육론1</option>
+          <option value="체육교육론2">⚽ 체육교육론2</option>
+          <option value="체육사 및 체육철학">⚽ 체육사 및 체육철학</option>
+          <option value="스포츠 윤리">⚽ 스포츠 윤리</option>
+          <option value="스포츠 사회학">⚽ 스포츠 사회학</option>
+          <option value="스포츠 심리학">⚽ 스포츠 심리학</option>
+          <option value="운동학습 제어">⚽ 운동학습 제어</option>
+          <option value="체육 측정 평가 및 통계">⚽ 체육 측정 평가 및 통계</option>
+          <option value="운동생리학">⚽ 운동생리학</option>
+          <option value="운동역학">⚽ 운동역학</option>
+          <option value="기출문제 분석">📝 기출문제 분석</option>
+          <option value="모의고사">📑 모의고사</option>
+        </select>
+      </div>
     </div>
 
     <!-- 대시보드 현황판 -->
@@ -58,7 +79,7 @@
         </div>
       </div>
       <button onclick="resetData()" class="text-xs text-slate-400 hover:text-rose-400 underline flex items-center gap-1">
-        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> 학습 데이터 초기화
+        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> 학습 기록 초기화
       </button>
     </div>
 
@@ -70,7 +91,7 @@
           <i data-lucide="book-open" class="w-5 h-5"></i>
         </div>
         <h3 class="font-bold text-slate-100 text-base">전체 문제 목록</h3>
-        <p class="text-slate-400 text-xs mt-1">모든 기출 및 서술형 문항 학습</p>
+        <p class="text-slate-400 text-xs mt-1">등록된 모든 전공/교육학 문제 학습</p>
       </div>
 
       <div onclick="filterStudy('count')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
@@ -78,7 +99,7 @@
           <i data-lucide="flame" class="w-5 h-5"></i>
         </div>
         <h3 class="font-bold text-slate-100 text-base">빈도순 연습</h3>
-        <p class="text-slate-400 text-xs mt-1">출제 빈도가 높은 핵심 문항부터</p>
+        <p class="text-slate-400 text-xs mt-1">출제 빈도(★)가 높은 핵심 문항부터</p>
       </div>
 
       <div onclick="filterStudy('year')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
@@ -86,7 +107,7 @@
           <i data-lucide="calendar" class="w-5 h-5"></i>
         </div>
         <h3 class="font-bold text-slate-100 text-base">연도별 기출</h3>
-        <p class="text-slate-400 text-xs mt-1">최신 2026~기출 연도별 풀이</p>
+        <p class="text-slate-400 text-xs mt-1">최신 연도별 기출 문제 순차 풀이</p>
       </div>
 
       <div onclick="filterStudy('wrong')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
@@ -94,15 +115,15 @@
           <i data-lucide="alert-circle" class="w-5 h-5"></i>
         </div>
         <h3 class="font-bold text-slate-100 text-base">오답 노트</h3>
-        <p class="text-slate-400 text-xs mt-1">틀린 문제 복습 및 정답 재확인</p>
+        <p class="text-slate-400 text-xs mt-1">틀린 문제 복습 및 재시험</p>
       </div>
 
-      <div onclick="filterStudy('subject')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
+      <div onclick="filterStudy('edu')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
         <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-3">
-          <i data-lucide="layers" class="w-5 h-5"></i>
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
         </div>
-        <h3 class="font-bold text-slate-100 text-base">과목/단원별 연습</h3>
-        <p class="text-slate-400 text-xs mt-1">생리학, 심리학, 교육학 선택 학습</p>
+        <h3 class="font-bold text-slate-100 text-base">일반교육학 모음</h3>
+        <p class="text-slate-400 text-xs mt-1">교육학 논술/서술형 문항 집중 학습</p>
       </div>
 
       <div onclick="startMockExam()" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
@@ -110,7 +131,7 @@
           <i data-lucide="file-text" class="w-5 h-5"></i>
         </div>
         <h3 class="font-bold text-slate-100 text-base">실전 모의고사</h3>
-        <p class="text-slate-400 text-xs mt-1">랜덤 문항 추출 실전 테스트</p>
+        <p class="text-slate-400 text-xs mt-1">전과목 랜덤 문항 추출 실전 테스트</p>
       </div>
 
     </div>
@@ -135,15 +156,12 @@
     let solvedIds = JSON.parse(localStorage.getItem('solved_ids') || '[]');
     let deferredPrompt;
 
-    // 아이콘 초기화
     lucide.createIcons();
 
-    // PWA 서비스워커 등록
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
     }
 
-    // PWA 설치 버튼 제어
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -160,7 +178,7 @@
       }
     });
 
-    // 문제 데이터 로드
+    // 문제 데이터 불러오기
     fetch('questions.json')
       .then(res => res.json())
       .then(data => {
@@ -177,6 +195,16 @@
     function showDashboard() {
       document.getElementById('gridDashboard').classList.remove('hidden');
       document.getElementById('studyArea').classList.add('hidden');
+      document.getElementById('subjectFilter').value = 'ALL';
+    }
+
+    function filterBySubject(subject) {
+      if (subject === 'ALL') {
+        showDashboard();
+        return;
+      }
+      const filtered = questions.filter(q => q.subject === subject);
+      renderQuestions(filtered, `[${subject}] 과목 문제`);
     }
 
     function filterStudy(type) {
@@ -185,13 +213,16 @@
 
       if (type === 'count') {
         list.sort((a, b) => b.count - a.count);
-        title = "빈도순 연습 (자주 나온 문제)";
+        title = "빈도순 연습 (출제빈도 높은 순)";
       } else if (type === 'year') {
         list.sort((a, b) => b.year - a.year);
         title = "연도별 기출 문항";
       } else if (type === 'wrong') {
         list = list.filter(q => wrongIds.includes(q.id));
         title = "오답노트";
+      } else if (type === 'edu') {
+        list = list.filter(q => q.major === "일반교육학" || q.subject === "일반교육학");
+        title = "일반교육학 모음";
       }
 
       renderQuestions(list, title);
@@ -211,7 +242,7 @@
       container.innerHTML = '';
 
       if (list.length === 0) {
-        container.innerHTML = `<p class="text-center text-slate-500 py-12">해당 조건에 일치하는 문제가 없습니다.</p>`;
+        container.innerHTML = `<p class="text-center text-slate-500 py-12">해당 과목/조건에 등록된 문제가 아직 없습니다.<br>questions.json 파일에 문제를 추가해보세요!</p>`;
         return;
       }
 
@@ -220,7 +251,7 @@
         card.className = "bg-slate-800/60 border border-slate-700/80 rounded-xl p-5 space-y-3";
         card.innerHTML = `
           <div class="flex justify-between items-center text-xs">
-            <span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-medium">${q.subject} · ${q.year}년</span>
+            <span class="bg-slate-700 text-slate-300 px-2.5 py-1 rounded font-medium">${q.major} > ${q.subject} · ${q.year}년</span>
             <span class="text-amber-400 font-medium">★ 출제 빈도: ${q.count}회</span>
           </div>
           <p class="font-bold text-slate-100 leading-relaxed text-base">Q. ${q.question}</p>
@@ -280,7 +311,6 @@
       }
     }
 
-    // 실시간 검색 기능
     document.getElementById('searchInput').addEventListener('input', (e) => {
       const val = e.target.value.trim().toLowerCase();
       if (!val) {
@@ -290,6 +320,7 @@
       const filtered = questions.filter(q => 
         q.question.toLowerCase().includes(val) || 
         q.answer.toLowerCase().includes(val) ||
+        q.subject.toLowerCase().includes(val) ||
         (q.keywords && q.keywords.some(k => k.toLowerCase().includes(val)))
       );
       renderQuestions(filtered, `'${val}' 검색 결과`);
