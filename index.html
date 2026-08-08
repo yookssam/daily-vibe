@@ -3,258 +3,297 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 중등임용 체육 AI 학습</title>
+  <title>건축기사 스타일 · 중등임용 체육 필답 노트</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .card-hover { transition: all 0.2s ease-in-out; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1); }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col pb-20">
 
-  <!-- 헤더 -->
-  <header class="bg-indigo-600 text-white p-4 shadow-md">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-      <h1 class="text-xl font-bold">📚 중등임용 체육 AI 학습</h1>
-      <span class="text-sm bg-indigo-700 px-3 py-1 rounded-full">GitHub Pages 호환</span>
+  <!-- 상단 헤더 -->
+  <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="bg-amber-500/20 text-amber-400 font-bold px-2.5 py-1 rounded text-sm border border-amber-500/30">
+          중등임용 체육
+        </span>
+        <h1 class="font-bold text-lg text-white tracking-tight">필답 학습 노트 <span class="text-xs text-slate-400 font-normal">v1.0</span></h1>
+      </div>
+      <button id="installBtn" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition">
+        <i data-lucide="download" class="w-4 h-4"></i> 앱 설치
+      </button>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto w-full flex-1 grid grid-cols-1 md:grid-cols-4 gap-6 p-6">
-    
-    <!-- 사이드바 (설정) -->
-    <aside class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-6 md:col-span-1">
-      <div>
-        <h2 class="text-lg font-bold mb-3 border-b pb-2">⚙️ API 설정</h2>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Gemini API 키</label>
-        <input type="password" id="apiKey" placeholder="API 키를 입력하세요" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        
-        <label class="block text-sm font-medium text-gray-700 mt-3 mb-1">모델 선택</label>
-        <select id="modelSelect" class="w-full p-2 border rounded-lg text-sm bg-white">
-          <option value="gemini-2.5-flash">gemini-2.5-flash (권장)</option>
-          <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-          <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-        </select>
+  <main class="max-w-5xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
+
+    <!-- 통합 검색바 -->
+    <div class="relative">
+      <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
+      <input type="text" id="searchInput" placeholder="키워드로 문제 및 정답 검색 (예: 젖산역치, 모스턴, 반두라)"
+        class="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-100 placeholder-slate-400">
+    </div>
+
+    <!-- 대시보드 현황판 -->
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 flex flex-wrap justify-between items-center gap-4 text-sm">
+      <div class="flex items-center gap-6">
+        <div>
+          <span class="text-slate-400 text-xs block">전체 문제</span>
+          <span id="totalCount" class="font-bold text-lg text-slate-200">0</span>
+        </div>
+        <div>
+          <span class="text-slate-400 text-xs block">풀이 완료</span>
+          <span id="solvedCount" class="font-bold text-lg text-indigo-400">0</span>
+        </div>
+        <div>
+          <span class="text-slate-400 text-xs block">오답 문제</span>
+          <span id="wrongCount" class="font-bold text-lg text-rose-400">0</span>
+        </div>
       </div>
+      <button onclick="resetData()" class="text-xs text-slate-400 hover:text-rose-400 underline flex items-center gap-1">
+        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> 학습 데이터 초기화
+      </button>
+    </div>
 
-      <div>
-        <h2 class="text-lg font-bold mb-3 border-b pb-2">⚽ 과목 선택</h2>
-        <label class="block text-sm font-medium text-gray-700 mb-1">대분류</label>
-        <select id="majorSelect" class="w-full p-2 border rounded-lg text-sm bg-white">
-          <option value="전공체육">전공체육</option>
-          <option value="교육학">교육학</option>
-        </select>
-
-        <label class="block text-sm font-medium text-gray-700 mt-3 mb-1">세부 과목</label>
-        <select id="subjectSelect" class="w-full p-2 border rounded-lg text-sm bg-white">
-          <option value="한암치료 암기카드">한암치료 암기카드</option>
-          <option value="스포츠 교육학">스포츠 교육학</option>
-          <option value="스포츠 사회학">스포츠 사회학</option>
-          <option value="스포츠 심리학">스포츠 심리학</option>
-          <option value="운동 생리학">운동 생리학</option>
-          <option value="운동 역학">운동 역학</option>
-        </select>
-      </div>
-
-      <div>
-        <h2 class="text-lg font-bold mb-3 border-b pb-2">📄 PDF 학습 자료 첨부</h2>
-        <input type="file" id="pdfFile" accept="application/pdf" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-        <p id="fileStatus" class="text-xs text-gray-500 mt-2">선택된 파일 없음</p>
-      </div>
-    </aside>
-
-    <!-- 메인 컨텐츠 영역 -->
-    <main class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 md:col-span-3 flex flex-col">
+    <!-- 메인 대시보드 카드 그리드 -->
+    <div id="gridDashboard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       
-      <!-- 탭 버튼 -->
-      <div class="flex border-b mb-6 space-x-4">
-        <button id="tabConceptBtn" class="pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600">개념 검색 & 출처 확인</button>
-        <button id="tabExamBtn" class="pb-2 border-b-2 border-transparent font-semibold text-gray-500 hover:text-indigo-600">AI 모의고사 & 서술형 채점</button>
+      <div onclick="filterStudy('all')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
+        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-3">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-100 text-base">전체 문제 목록</h3>
+        <p class="text-slate-400 text-xs mt-1">모든 기출 및 서술형 문항 학습</p>
       </div>
 
-      <!-- 탭 1: 개념 검색 -->
-      <section id="tabConcept" class="space-y-4">
-        <div class="flex gap-2">
-          <input type="text" id="queryInput" placeholder="검색할 개념을 입력하세요 (예: 심폐지구력, 스포츠 윤리 등)" class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-          <button onclick="runConceptSearch()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 font-medium text-sm">개념 검색</button>
+      <div onclick="filterStudy('count')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
+        <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center mb-3">
+          <i data-lucide="flame" class="w-5 h-5"></i>
         </div>
-      </section>
-
-      <!-- 탭 2: 모의고사 -->
-      <section id="tabExam" class="space-y-4 hidden">
-        <div class="flex gap-2">
-          <button onclick="generateExam()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 font-medium text-sm">새 모의 문제 생성</button>
-        </div>
-        <div id="examContainer" class="p-4 bg-gray-50 rounded-lg border hidden">
-          <h3 class="font-bold text-gray-800 mb-2">[생성된 서술형 문제]</h3>
-          <div id="examText" class="text-sm text-gray-700 whitespace-pre-wrap mb-4"></div>
-          
-          <label class="block text-sm font-medium text-gray-700 mb-1">나의 답안 작성</label>
-          <textarea id="userAnswer" rows="5" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="150~300자 내외로 서술형 답안을 작성하세요."></textarea>
-          <button onclick="gradeExam()" class="mt-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-medium text-sm">답안 채점하기</button>
-        </div>
-      </section>
-
-      <!-- 로딩 및 결과 표시 영역 -->
-      <div id="loading" class="hidden mt-6 text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
-        <p class="text-sm text-gray-600 mt-2">AI가 PDF 자료를 분석 및 처리 중입니다...</p>
+        <h3 class="font-bold text-slate-100 text-base">빈도순 연습</h3>
+        <p class="text-slate-400 text-xs mt-1">출제 빈도가 높은 핵심 문항부터</p>
       </div>
 
-      <div id="resultBox" class="mt-6 p-4 bg-gray-50 rounded-lg border text-sm whitespace-pre-wrap leading-relaxed hidden"></div>
-    </main>
+      <div onclick="filterStudy('year')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
+        <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mb-3">
+          <i data-lucide="calendar" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-100 text-base">연도별 기출</h3>
+        <p class="text-slate-400 text-xs mt-1">최신 2024~기출 연도별 풀이</p>
+      </div>
 
-  </div>
+      <div onclick="filterStudy('wrong')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
+        <div class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center mb-3">
+          <i data-lucide="alert-circle" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-100 text-base">오답 노트</h3>
+        <p class="text-slate-400 text-xs mt-1">틀린 문제 복습 및 정답 재확인</p>
+      </div>
 
-  <script type="module">
-    import { GoogleGenAI } from "https://esm.sh/@google/genai";
+      <div onclick="filterStudy('subject')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
+        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-3">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-100 text-base">과목/단원별 연습</h3>
+        <p class="text-slate-400 text-xs mt-1">생리학, 심리학, 교육학 선택 학습</p>
+      </div>
 
-    let pdfBase64 = null;
-    let currentExamText = "";
+      <div onclick="startMockExam()" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
+        <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3">
+          <i data-lucide="file-text" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-100 text-base">실전 모의고사</h3>
+        <p class="text-slate-400 text-xs mt-1">랜덤 문항 추출 실전 테스트</p>
+      </div>
 
-    // DOM 요소
-    const apiKeyEl = document.getElementById('apiKey');
-    const modelSelectEl = document.getElementById('modelSelect');
-    const majorSelectEl = document.getElementById('majorSelect');
-    const subjectSelectEl = document.getElementById('subjectSelect');
-    const pdfFileEl = document.getElementById('pdfFile');
-    const fileStatusEl = document.getElementById('fileStatus');
-    
-    const tabConceptBtn = document.getElementById('tabConceptBtn');
-    const tabExamBtn = document.getElementById('tabExamBtn');
-    const tabConcept = document.getElementById('tabConcept');
-    const tabExam = document.getElementById('tabExam');
-    
-    const loadingEl = document.getElementById('loading');
-    const resultBoxEl = document.getElementById('resultBox');
+    </div>
 
-    // 탭 전환 이벤트
-    tabConceptBtn.addEventListener('click', () => switchTab('concept'));
-    tabExamBtn.addEventListener('click', () => switchTab('exam'));
+    <!-- 문제 리스트 / 학습 영역 -->
+    <div id="studyArea" class="hidden space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <button onclick="showDashboard()" class="text-sm text-slate-400 hover:text-white flex items-center gap-1">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> 대시보드로 돌아가기
+        </button>
+        <span id="studyTitle" class="font-bold text-amber-400 text-sm">전체 문제</span>
+      </div>
 
-    function switchTab(type) {
-      if (type === 'concept') {
-        tabConcept.classList.remove('hidden');
-        tabExam.classList.add('hidden');
-        tabConceptBtn.className = "pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
-        tabExamBtn.className = "pb-2 border-b-2 border-transparent font-semibold text-gray-500 hover:text-indigo-600";
-      } else {
-        tabConcept.classList.add('hidden');
-        tabExam.classList.remove('hidden');
-        tabExamBtn.className = "pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
-        tabConceptBtn.className = "pb-2 border-b-2 border-transparent font-semibold text-gray-500 hover:text-indigo-600";
-      }
+      <div id="questionList" class="space-y-4"></div>
+    </div>
+
+  </main>
+
+  <script>
+    let questions = [];
+    let wrongIds = JSON.parse(localStorage.getItem('wrong_ids') || '[]');
+    let solvedIds = JSON.parse(localStorage.getItem('solved_ids') || '[]');
+    let deferredPrompt;
+
+    // 아이콘 초기화
+    lucide.createIcons();
+
+    // PWA 서비스워커 등록
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
     }
 
-    // PDF 파일 Base64 변환
-    pdfFileEl.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      fileStatusEl.textContent = `선택됨: ${file.name} (${(file.size / (1024*1024)).toFixed(1)}MB)`;
-      
-      const reader = new FileReader();
-      reader.onload = () => {
-        pdfBase64 = reader.result.split(',')[1];
-      };
-      reader.readAsDataURL(file);
+    // PWA 설치 버튼 제어
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installBtn').classList.remove('hidden');
     });
 
-    // Gemini API 호출 공통 함수
-    async function callGemini(promptText) {
-      const apiKey = apiKeyEl.value.trim();
-      if (!apiKey) throw new Error("사이드바에 Gemini API 키를 입력해주세요.");
-
-      const ai = new GoogleGenAI({ apiKey });
-      const model = modelSelectEl.value;
-      const major = majorSelectEl.value;
-      const subject = subjectSelectEl.value;
-
-      const systemInstruction = `당신은 중등임용 체육 시험 전문 AI입니다. 과목: [${major} > ${subject}]. 첨부된 PDF 자료를 바탕으로 질문에 정확히 답변하세요.`;
-
-      const contents = [];
-      if (pdfBase64) {
-        contents.push({
-          inlineData: {
-            mimeType: "application/pdf",
-            data: pdfBase64
-          }
+    document.getElementById('installBtn').addEventListener('click', () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          document.getElementById('installBtn').classList.add('hidden');
         });
       }
-      contents.push(promptText);
+    });
 
-      const response = await ai.models.generateContent({
-        model,
-        contents,
-        config: { systemInstruction }
+    // 문제 데이터 로드
+    fetch('questions.json')
+      .then(res => res.json())
+      .then(data => {
+        questions = data;
+        updateDashboardCounts();
       });
 
-      return response.text;
+    function updateDashboardCounts() {
+      document.getElementById('totalCount').textContent = questions.length;
+      document.getElementById('solvedCount').textContent = solvedIds.length;
+      document.getElementById('wrongCount').textContent = wrongIds.length;
     }
 
-    // 1. 개념 검색
-    window.runConceptSearch = async function() {
-      const query = document.getElementById('queryInput').value.trim();
-      if (!query) return alert("검색어를 입력하세요.");
-
-      showLoading(true);
-      try {
-        const prompt = `검색어 [${query}]에 대해 첨부된 PDF 내용을 바탕으로 핵심 개념과 출처 페이지를 정리해주세요.`;
-        const result = await callGemini(prompt);
-        showResult(result);
-      } catch (err) {
-        alert("오류 발생: " + err.message);
-      } finally {
-        showLoading(false);
-      }
-    };
-
-    // 2. 모의고사 생성
-    window.generateExam = async function() {
-      showLoading(true);
-      try {
-        const prompt = `첨부된 PDF 내용을 바탕으로 중등임용 체육 1차 스타일 서술형 문제 1개(배점 20점)와 출제의도를 작성해주세요.`;
-        const result = await callGemini(prompt);
-        currentExamText = result;
-        document.getElementById('examText').textContent = result;
-        document.getElementById('examContainer').classList.remove('hidden');
-        showResult("");
-      } catch (err) {
-        alert("문제 생성 오류: " + err.message);
-      } finally {
-        showLoading(false);
-      }
-    };
-
-    // 3. 서술형 채점
-    window.gradeExam = async function() {
-      const userAnswer = document.getElementById('userAnswer').value.trim();
-      if (!userAnswer) return alert("답안을 작성해주세요.");
-
-      showLoading(true);
-      try {
-        const prompt = `[문제]\n${currentExamText}\n\n[작성 답안]\n${userAnswer}\n\n위 답안을 PDF 원본 내용을 기준 삼아 20점 만점으로 상세 채점하고 피드백을 주세요.`;
-        const result = await callGemini(prompt);
-        showResult(result);
-      } catch (err) {
-        alert("채점 오류: " + err.message);
-      } finally {
-        showLoading(false);
-      }
-    };
-
-    function showLoading(state) {
-      if (state) {
-        loadingEl.classList.remove('hidden');
-        resultBoxEl.classList.add('hidden');
-      } else {
-        loadingEl.classList.add('hidden');
-      }
+    function showDashboard() {
+      document.getElementById('gridDashboard').classList.remove('hidden');
+      document.getElementById('studyArea').classList.add('hidden');
     }
 
-    function showResult(text) {
-      if (!text) {
-        resultBoxEl.classList.add('hidden');
+    function filterStudy(type) {
+      let list = [...questions];
+      let title = "전체 문제";
+
+      if (type === 'count') {
+        list.sort((a, b) => b.count - a.count);
+        title = "빈도순 연습 (자주 나온 문제)";
+      } else if (type === 'year') {
+        list.sort((a, b) => b.year - a.year);
+        title = "연도별 기출 문항";
+      } else if (type === 'wrong') {
+        list = list.filter(q => wrongIds.includes(q.id));
+        title = "오답노트";
+      }
+
+      renderQuestions(list, title);
+    }
+
+    function startMockExam() {
+      const shuffled = [...questions].sort(() => 0.5 - Math.random()).slice(0, 5);
+      renderQuestions(shuffled, "실전 모의고사 (랜덤 5문항)");
+    }
+
+    function renderQuestions(list, title) {
+      document.getElementById('gridDashboard').classList.add('hidden');
+      document.getElementById('studyArea').classList.remove('hidden');
+      document.getElementById('studyTitle').textContent = title;
+
+      const container = document.getElementById('questionList');
+      container.innerHTML = '';
+
+      if (list.length === 0) {
+        container.innerHTML = `<p class="text-center text-slate-500 py-12">해당 조건에 일치하는 문제가 없습니다.</p>`;
         return;
       }
-      resultBoxEl.textContent = text;
-      resultBoxEl.classList.remove('hidden');
+
+      list.forEach(q => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-800/60 border border-slate-700/80 rounded-xl p-5 space-y-3";
+        card.innerHTML = `
+          <div class="flex justify-between items-center text-xs">
+            <span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-medium">${q.subject} · ${q.year}년</span>
+            <span class="text-amber-400 font-medium">★ 출제 빈도: ${q.count}회</span>
+          </div>
+          <p class="font-bold text-slate-100 leading-relaxed text-base">Q. ${q.question}</p>
+          
+          <button onclick="toggleAnswer(${q.id})" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 py-1">
+            <i data-lucide="eye" class="w-3.5 h-3.5"></i> 정답 및 모범답안 보기
+          </button>
+
+          <div id="ans-${q.id}" class="hidden bg-slate-900/90 p-4 rounded-lg border border-slate-700/50 text-sm text-slate-300 whitespace-pre-line leading-relaxed">
+            <strong class="text-emerald-400 block mb-1">[모범 답안]</strong>
+            ${q.answer}
+          </div>
+
+          <div class="flex gap-2 pt-2 border-t border-slate-700/50">
+            <button onclick="markStatus(${q.id}, 'correct')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs py-2 rounded-lg font-medium transition">
+              정답 (맞힘)
+            </button>
+            <button onclick="markStatus(${q.id}, 'wrong')" class="flex-1 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 text-xs py-2 rounded-lg font-medium transition">
+              오답 (틀림)
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
     }
+
+    function toggleAnswer(id) {
+      const el = document.getElementById(`ans-${id}`);
+      el.classList.toggle('hidden');
+    }
+
+    function markStatus(id, type) {
+      if (!solvedIds.includes(id)) solvedIds.push(id);
+
+      if (type === 'wrong' && !wrongIds.includes(id)) {
+        wrongIds.push(id);
+      } else if (type === 'correct') {
+        wrongIds = wrongIds.filter(item => item !== id);
+      }
+
+      localStorage.setItem('solved_ids', JSON.stringify(solvedIds));
+      localStorage.setItem('wrong_ids', JSON.stringify(wrongIds));
+
+      updateDashboardCounts();
+      alert(type === 'correct' ? '맞힌 문제로 기록되었습니다!' : '오답노트에 추가되었습니다.');
+    }
+
+    function resetData() {
+      if (confirm('모든 문제 풀이 및 오답 기록을 초기화하시겠습니까?')) {
+        localStorage.clear();
+        solvedIds = [];
+        wrongIds = [];
+        updateDashboardCounts();
+        showDashboard();
+      }
+    }
+
+    // 실시간 검색 기능
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const val = e.target.value.trim().toLowerCase();
+      if (!val) {
+        showDashboard();
+        return;
+      }
+      const filtered = questions.filter(q => 
+        q.question.toLowerCase().includes(val) || 
+        q.answer.toLowerCase().includes(val) ||
+        (q.keywords && q.keywords.some(k => k.toLowerCase().includes(val)))
+      );
+      renderQuestions(filtered, `'${val}' 검색 결과`);
+    });
   </script>
 </body>
 </html>
