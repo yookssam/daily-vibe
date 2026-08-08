@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📚 중등임용 체육 AI 학습</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- 헤더 -->
+  <header class="bg-indigo-600 text-white p-4 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-xl font-bold">📚 중등임용 체육 AI 학습</h1>
+      <span class="text-sm bg-indigo-700 px-3 py-1 rounded-full">GitHub Pages 호환</span>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto w-full flex-1 grid grid-cols-1 md:grid-cols-4 gap-6 p-6">
+    
+    <!-- 사이드바 (설정) -->
+    <aside class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-6 md:col-span-1">
+      <div>
+        <h2 class="text-lg font-bold mb-3 border-b pb-2">⚙️ API 설정</h2>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Gemini API 키</label>
+        <input type="password" id="apiKey" placeholder="API 키를 입력하세요" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        
+        <label class="block text-sm font-medium text-gray-700 mt-3 mb-1">모델 선택</label>
+        <select id="modelSelect" class="w-full p-2 border rounded-lg text-sm bg-white">
+          <option value="gemini-2.5-flash">gemini-2.5-flash (권장)</option>
+          <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+          <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+        </select>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold mb-3 border-b pb-2">⚽ 과목 선택</h2>
+        <label class="block text-sm font-medium text-gray-700 mb-1">대분류</label>
+        <select id="majorSelect" class="w-full p-2 border rounded-lg text-sm bg-white">
+          <option value="전공체육">전공체육</option>
+          <option value="교육학">교육학</option>
+        </select>
+
+        <label class="block text-sm font-medium text-gray-700 mt-3 mb-1">세부 과목</label>
+        <select id="subjectSelect" class="w-full p-2 border rounded-lg text-sm bg-white">
+          <option value="한암치료 암기카드">한암치료 암기카드</option>
+          <option value="스포츠 교육학">스포츠 교육학</option>
+          <option value="스포츠 사회학">스포츠 사회학</option>
+          <option value="스포츠 심리학">스포츠 심리학</option>
+          <option value="운동 생리학">운동 생리학</option>
+          <option value="운동 역학">운동 역학</option>
+        </select>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold mb-3 border-b pb-2">📄 PDF 학습 자료 첨부</h2>
+        <input type="file" id="pdfFile" accept="application/pdf" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+        <p id="fileStatus" class="text-xs text-gray-500 mt-2">선택된 파일 없음</p>
+      </div>
+    </aside>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 md:col-span-3 flex flex-col">
+      
+      <!-- 탭 버튼 -->
+      <div class="flex border-b mb-6 space-x-4">
+        <button id="tabConceptBtn" class="pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600">개념 검색 & 출처 확인</button>
+        <button id="tabExamBtn" class="pb-2 border-b-2 border-transparent font-semibold text-gray-500 hover:text-indigo-600">AI 모의고사 & 서술형 채점</button>
+      </div>
+
+      <!-- 탭 1: 개념 검색 -->
+      <section id="tabConcept" class="space-y-4">
+        <div class="flex gap-2">
+          <input type="text" id="queryInput" placeholder="검색할 개념을 입력하세요 (예: 심폐지구력, 스포츠 윤리 등)" class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <button onclick="runConceptSearch()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 font-medium text-sm">개념 검색</button>
+        </div>
+      </section>
+
+      <!-- 탭 2: 모의고사 -->
+      <section id="tabExam" class="space-y-4 hidden">
+        <div class="flex gap-2">
+          <button onclick="generateExam()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 font-medium text-sm">새 모의 문제 생성</button>
+        </div>
+        <div id="examContainer" class="p-4 bg-gray-50 rounded-lg border hidden">
+          <h3 class="font-bold text-gray-800 mb-2">[생성된 서술형 문제]</h3>
+          <div id="examText" class="text-sm text-gray-700 whitespace-pre-wrap mb-4"></div>
+          
+          <label class="block text-sm font-medium text-gray-700 mb-1">나의 답안 작성</label>
+          <textarea id="userAnswer" rows="5" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="150~300자 내외로 서술형 답안을 작성하세요."></textarea>
+          <button onclick="gradeExam()" class="mt-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-medium text-sm">답안 채점하기</button>
+        </div>
+      </section>
+
+      <!-- 로딩 및 결과 표시 영역 -->
+      <div id="loading" class="hidden mt-6 text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
+        <p class="text-sm text-gray-600 mt-2">AI가 PDF 자료를 분석 및 처리 중입니다...</p>
+      </div>
+
+      <div id="resultBox" class="mt-6 p-4 bg-gray-50 rounded-lg border text-sm whitespace-pre-wrap leading-relaxed hidden"></div>
+    </main>
+
+  </div>
+
+  <script type="module">
+    import { GoogleGenAI } from "https://esm.sh/@google/genai";
+
+    let pdfBase64 = null;
+    let currentExamText = "";
+
+    // DOM 요소
+    const apiKeyEl = document.getElementById('apiKey');
+    const modelSelectEl = document.getElementById('modelSelect');
+    const majorSelectEl = document.getElementById('majorSelect');
+    const subjectSelectEl = document.getElementById('subjectSelect');
+    const pdfFileEl = document.getElementById('pdfFile');
+    const fileStatusEl = document.getElementById('fileStatus');
+    
+    const tabConceptBtn = document.getElementById('tabConceptBtn');
+    const tabExamBtn = document.getElementById('tabExamBtn');
+    const tabConcept = document.getElementById('tabConcept');
+    const tabExam = document.getElementById('tabExam');
+    
+    const loadingEl = document.getElementById('loading');
+    const resultBoxEl = document.getElementById('resultBox');
+
+    // 탭 전환 이벤트
+    tabConceptBtn.addEventListener('click', () => switchTab('concept'));
+    tabExamBtn.addEventListener('click', () => switchTab('exam'));
+
+    function switchTab(type) {
+      if (type === 'concept') {
+        tabConcept.classList.remove('hidden');
+        tabExam.classList.add('hidden');
+        tabConceptBtn.className = "pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
+        tabExamBtn.className = "pb-2 border-b-2 border-transparent font-semibold text-gray-500 hover:text-indigo-600";
+      } else {
+        tabConcept.classList.add('hidden');
+        tabExam.classList.remove('hidden');
+        tabExamBtn.className = "pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
+        tabConceptBtn.className = "pb-2 border-b-2 border-transparent font-semibold text-gray-500 hover:text-indigo-600";
+      }
+    }
+
+    // PDF 파일 Base64 변환
+    pdfFileEl.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      fileStatusEl.textContent = `선택됨: ${file.name} (${(file.size / (1024*1024)).toFixed(1)}MB)`;
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        pdfBase64 = reader.result.split(',')[1];
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Gemini API 호출 공통 함수
+    async function callGemini(promptText) {
+      const apiKey = apiKeyEl.value.trim();
+      if (!apiKey) throw new Error("사이드바에 Gemini API 키를 입력해주세요.");
+
+      const ai = new GoogleGenAI({ apiKey });
+      const model = modelSelectEl.value;
+      const major = majorSelectEl.value;
+      const subject = subjectSelectEl.value;
+
+      const systemInstruction = `당신은 중등임용 체육 시험 전문 AI입니다. 과목: [${major} > ${subject}]. 첨부된 PDF 자료를 바탕으로 질문에 정확히 답변하세요.`;
+
+      const contents = [];
+      if (pdfBase64) {
+        contents.push({
+          inlineData: {
+            mimeType: "application/pdf",
+            data: pdfBase64
+          }
+        });
+      }
+      contents.push(promptText);
+
+      const response = await ai.models.generateContent({
+        model,
+        contents,
+        config: { systemInstruction }
+      });
+
+      return response.text;
+    }
+
+    // 1. 개념 검색
+    window.runConceptSearch = async function() {
+      const query = document.getElementById('queryInput').value.trim();
+      if (!query) return alert("검색어를 입력하세요.");
+
+      showLoading(true);
+      try {
+        const prompt = `검색어 [${query}]에 대해 첨부된 PDF 내용을 바탕으로 핵심 개념과 출처 페이지를 정리해주세요.`;
+        const result = await callGemini(prompt);
+        showResult(result);
+      } catch (err) {
+        alert("오류 발생: " + err.message);
+      } finally {
+        showLoading(false);
+      }
+    };
+
+    // 2. 모의고사 생성
+    window.generateExam = async function() {
+      showLoading(true);
+      try {
+        const prompt = `첨부된 PDF 내용을 바탕으로 중등임용 체육 1차 스타일 서술형 문제 1개(배점 20점)와 출제의도를 작성해주세요.`;
+        const result = await callGemini(prompt);
+        currentExamText = result;
+        document.getElementById('examText').textContent = result;
+        document.getElementById('examContainer').classList.remove('hidden');
+        showResult("");
+      } catch (err) {
+        alert("문제 생성 오류: " + err.message);
+      } finally {
+        showLoading(false);
+      }
+    };
+
+    // 3. 서술형 채점
+    window.gradeExam = async function() {
+      const userAnswer = document.getElementById('userAnswer').value.trim();
+      if (!userAnswer) return alert("답안을 작성해주세요.");
+
+      showLoading(true);
+      try {
+        const prompt = `[문제]\n${currentExamText}\n\n[작성 답안]\n${userAnswer}\n\n위 답안을 PDF 원본 내용을 기준 삼아 20점 만점으로 상세 채점하고 피드백을 주세요.`;
+        const result = await callGemini(prompt);
+        showResult(result);
+      } catch (err) {
+        alert("채점 오류: " + err.message);
+      } finally {
+        showLoading(false);
+      }
+    };
+
+    function showLoading(state) {
+      if (state) {
+        loadingEl.classList.remove('hidden');
+        resultBoxEl.classList.add('hidden');
+      } else {
+        loadingEl.classList.add('hidden');
+      }
+    }
+
+    function showResult(text) {
+      if (!text) {
+        resultBoxEl.classList.add('hidden');
+        return;
+      }
+      resultBoxEl.textContent = text;
+      resultBoxEl.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
