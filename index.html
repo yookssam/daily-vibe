@@ -3,328 +3,185 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2027대비 중등임용 체육 학습 노트</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f172a">
-  <!-- Tailwind CSS & Lucide Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>체육 임용고시 문제 은행</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .card-hover { transition: all 0.2s ease-in-out; }
-    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3); }
+    :root {
+      --primary-color: #3b82f6;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --border-color: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      color: #64748b;
+      margin: 0;
+    }
+
+    /* 카테고리 필터 스타일 */
+    .filter-container {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+
+    .filter-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .category-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cat-btn {
+      border: 1px solid var(--border-color);
+      background: #f1f5f9;
+      color: #475569;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .cat-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .cat-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    /* 문제 카드 목록 */
+    .quiz-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .quiz-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .quiz-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      background: #eff6ff;
+      color: var(--primary-color);
+      margin-bottom: 8px;
+    }
+
+    .quiz-card h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.1rem;
+    }
+
+    .quiz-card p {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin: 0;
+    }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col pb-20">
+<body>
 
-  <!-- 상단 헤더 -->
-  <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <span class="bg-amber-500/20 text-amber-400 font-bold px-2.5 py-1 rounded text-sm border border-amber-500/30">
-          중등임용 체육
-        </span>
-        <h1 class="font-bold text-lg text-white tracking-tight"> 학습 노트 <span class="text-xs text-slate-400 font-normal">v1.1</span></h1>
-      </div>
-      <button id="installBtn" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition">
-        <i data-lucide="download" class="w-4 h-4"></i> 앱 설치
-      </button>
-    </div>
-  </header>
+  <div class="container">
+    <header>
+      <h1>🏋️‍♂️ 체육 임용고시 문제 은행</h1>
+      <p class="subtitle">과목별 카테고리를 선택하여 원하는 문제를 풀어보세요.</p>
+    </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
-
-    <!-- 키워드 및 과목 필터 검색바 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div class="md:col-span-2 relative">
-        <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
-        <input type="text" id="searchInput" placeholder="키워드로 문제 및 정답 검색 (예: 젖산역치, 모스턴, 타일러)"
-          class="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-100 placeholder-slate-400">
-      </div>
-      <div>
-        <select id="subjectFilter" onchange="filterBySubject(this.value)" class="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-100 cursor-pointer">
-          <option value="ALL">전체 과목 보기</option>
-          <option value="일반교육학">📄 일반교육학</option>
-          <option value="체육교육과정">⚽ 체육교육과정</option>
-          <option value="체육교육론1">⚽ 체육교육론1</option>
-          <option value="체육교육론2">⚽ 체육교육론2</option>
-          <option value="체육사 및 체육철학">⚽ 체육사 및 체육철학</option>
-          <option value="스포츠 윤리">⚽ 스포츠 윤리</option>
-          <option value="스포츠 사회학">⚽ 스포츠 사회학</option>
-          <option value="스포츠 심리학">⚽ 스포츠 심리학</option>
-          <option value="운동학습 제어">⚽ 운동학습 제어</option>
-          <option value="체육 측정 평가 및 통계">⚽ 체육 측정 평가 및 통계</option>
-          <option value="운동생리학">⚽ 운동생리학</option>
-          <option value="운동역학">⚽ 운동역학</option>
-          <option value="기출문제 분석">📝 기출문제 분석</option>
-          <option value="모의고사">📑 모의고사</option>
-        </select>
+    <!-- 과목 카테고리 필터 영역 -->
+    <div class="filter-container">
+      <span class="filter-title">📚 과목 선택 (14개 과목)</span>
+      <div class="category-buttons" id="categoryButtons">
+        <button class="cat-btn active" onclick="filterCategory('전체')">전체보기</button>
+        <!-- 체육교육론 영역 -->
+        <button class="cat-btn" onclick="filterCategory('체육교육론')">체육교육론</button>
+        <button class="cat-btn" onclick="filterCategory('체육수업비평')">체육수업비평</button>
+        <!-- 스포츠사회학/심리학 영역 -->
+        <button class="cat-btn" onclick="filterCategory('스포츠사회학')">스포츠사회학</button>
+        <button class="cat-btn" onclick="filterCategory('스포츠심리학')">스포츠심리학</button>
+        <button class="cat-btn" onclick="filterCategory('운동제어/학습')">운동제어/학습</button>
+        <button class="cat-btn" onclick="filterCategory('운동발달')">운동발달</button>
+        <!-- 체육사/철학 영역 -->
+        <button class="cat-btn" onclick="filterCategory('한국체육사')">한국체육사</button>
+        <button class="cat-btn" onclick="filterCategory('서양체육사')">서양체육사</button>
+        <button class="cat-btn" onclick="filterCategory('체육철학')">체육철학</button>
+        <button class="cat-btn" onclick="filterCategory('스포츠윤리학')">스포츠윤리학</button>
+        <!-- 생리학/역학/측정 평가 영역 -->
+        <button class="cat-btn" onclick="filterCategory('운동생리학')">운동생리학</button>
+        <button class="cat-btn" onclick="filterCategory('운동역학')">운동역학</button>
+        <button class="cat-btn" onclick="filterCategory('체육측정평가')">체육측정평가</button>
+        <button class="cat-btn" onclick="filterCategory('건강/체력')">건강/체력</button>
       </div>
     </div>
 
-    <!-- 대시보드 현황판 -->
-    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 flex flex-wrap justify-between items-center gap-4 text-sm">
-      <div class="flex items-center gap-6">
-        <div>
-          <span class="text-slate-400 text-xs block">전체 문제</span>
-          <span id="totalCount" class="font-bold text-lg text-slate-200">0</span>
-        </div>
-        <div>
-          <span class="text-slate-400 text-xs block">풀이 완료</span>
-          <span id="solvedCount" class="font-bold text-lg text-indigo-400">0</span>
-        </div>
-        <div>
-          <span class="text-slate-400 text-xs block">오답 문제</span>
-          <span id="wrongCount" class="font-bold text-lg text-rose-400">0</span>
-        </div>
-      </div>
-      <button onclick="resetData()" class="text-xs text-slate-400 hover:text-rose-400 underline flex items-center gap-1">
-        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> 학습 기록 초기화
-      </button>
+    <!-- 문제 카드 리스트 출력 영역 -->
+    <div class="quiz-list" id="quizList">
+      <!-- JavaScript를 통해 문제가 여기에 동적으로 로드됩니다. -->
     </div>
-
-    <!-- 메인 대시보드 카드 그리드 -->
-    <div id="gridDashboard" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      
-      <div onclick="filterStudy('all')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
-        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-3">
-          <i data-lucide="book-open" class="w-5 h-5"></i>
-        </div>
-        <h3 class="font-bold text-slate-100 text-base">전체 문제 목록</h3>
-        <p class="text-slate-400 text-xs mt-1">등록된 모든 전공/교육학 문제 학습</p>
-      </div>
-
-      <div onclick="filterStudy('count')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
-        <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center mb-3">
-          <i data-lucide="flame" class="w-5 h-5"></i>
-        </div>
-        <h3 class="font-bold text-slate-100 text-base">빈도순 연습</h3>
-        <p class="text-slate-400 text-xs mt-1">출제 빈도(★)가 높은 핵심 문항부터</p>
-      </div>
-
-      <div onclick="filterStudy('year')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
-        <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mb-3">
-          <i data-lucide="calendar" class="w-5 h-5"></i>
-        </div>
-        <h3 class="font-bold text-slate-100 text-base">연도별 기출</h3>
-        <p class="text-slate-400 text-xs mt-1">최신 연도별 기출 문제 순차 풀이</p>
-      </div>
-
-      <div onclick="filterStudy('wrong')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
-        <div class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center mb-3">
-          <i data-lucide="alert-circle" class="w-5 h-5"></i>
-        </div>
-        <h3 class="font-bold text-slate-100 text-base">오답 노트</h3>
-        <p class="text-slate-400 text-xs mt-1">틀린 문제 복습 및 재시험</p>
-      </div>
-
-      <div onclick="filterStudy('edu')" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
-        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-3">
-          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
-        </div>
-        <h3 class="font-bold text-slate-100 text-base">일반교육학 모음</h3>
-        <p class="text-slate-400 text-xs mt-1">교육학 논술/서술형 문항 집중 학습</p>
-      </div>
-
-      <div onclick="startMockExam()" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 card-hover cursor-pointer">
-        <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3">
-          <i data-lucide="file-text" class="w-5 h-5"></i>
-        </div>
-        <h3 class="font-bold text-slate-100 text-base">실전 모의고사</h3>
-        <p class="text-slate-400 text-xs mt-1">전과목 랜덤 문항 추출 실전 테스트</p>
-      </div>
-
-    </div>
-
-    <!-- 문제 리스트 / 학습 영역 -->
-    <div id="studyArea" class="hidden space-y-4">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <button onclick="showDashboard()" class="text-sm text-slate-400 hover:text-white flex items-center gap-1">
-          <i data-lucide="arrow-left" class="w-4 h-4"></i> 대시보드로 돌아가기
-        </button>
-        <span id="studyTitle" class="font-bold text-amber-400 text-sm">전체 문제</span>
-      </div>
-
-      <div id="questionList" class="space-y-4"></div>
-    </div>
-
-  </main>
+  </div>
 
   <script>
-    let questions = [];
-    let wrongIds = JSON.parse(localStorage.getItem('wrong_ids') || '[]');
-    let solvedIds = JSON.parse(localStorage.getItem('solved_ids') || '[]');
-    let deferredPrompt;
+    // 필터링 동작 함수
+    function filterCategory(categoryName) {
+      // 1. 모든 버튼에서 active 클래스 제거
+      const buttons = document.querySelectorAll('.cat-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
 
-    lucide.createIcons();
+      // 2. 클릭한 버튼에 active 클래스 추가
+      event.target.classList.add('active');
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
+      // 3. 문제 필터링 처리 (추후 JSON 데이터와 연동)
+      console.log(`선택된 카테고리: ${categoryName}`);
+      
+      // TODO: json 데이터 로드 및 Rendering 로직 연결
     }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installBtn').classList.remove('hidden');
-    });
-
-    document.getElementById('installBtn').addEventListener('click', () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-          document.getElementById('installBtn').classList.add('hidden');
-        });
-      }
-    });
-
-    // 문제 데이터 불러오기
-    fetch('questions.json')
-      .then(res => res.json())
-      .then(data => {
-        questions = data;
-        updateDashboardCounts();
-      });
-
-    function updateDashboardCounts() {
-      document.getElementById('totalCount').textContent = questions.length;
-      document.getElementById('solvedCount').textContent = solvedIds.length;
-      document.getElementById('wrongCount').textContent = wrongIds.length;
-    }
-
-    function showDashboard() {
-      document.getElementById('gridDashboard').classList.remove('hidden');
-      document.getElementById('studyArea').classList.add('hidden');
-      document.getElementById('subjectFilter').value = 'ALL';
-    }
-
-    function filterBySubject(subject) {
-      if (subject === 'ALL') {
-        showDashboard();
-        return;
-      }
-      const filtered = questions.filter(q => q.subject === subject);
-      renderQuestions(filtered, `[${subject}] 과목 문제`);
-    }
-
-    function filterStudy(type) {
-      let list = [...questions];
-      let title = "전체 문제";
-
-      if (type === 'count') {
-        list.sort((a, b) => b.count - a.count);
-        title = "빈도순 연습 (출제빈도 높은 순)";
-      } else if (type === 'year') {
-        list.sort((a, b) => b.year - a.year);
-        title = "연도별 기출 문항";
-      } else if (type === 'wrong') {
-        list = list.filter(q => wrongIds.includes(q.id));
-        title = "오답노트";
-      } else if (type === 'edu') {
-        list = list.filter(q => q.major === "일반교육학" || q.subject === "일반교육학");
-        title = "일반교육학 모음";
-      }
-
-      renderQuestions(list, title);
-    }
-
-    function startMockExam() {
-      const shuffled = [...questions].sort(() => 0.5 - Math.random()).slice(0, 5);
-      renderQuestions(shuffled, "실전 모의고사 (랜덤 5문항)");
-    }
-
-    function renderQuestions(list, title) {
-      document.getElementById('gridDashboard').classList.add('hidden');
-      document.getElementById('studyArea').classList.remove('hidden');
-      document.getElementById('studyTitle').textContent = title;
-
-      const container = document.getElementById('questionList');
-      container.innerHTML = '';
-
-      if (list.length === 0) {
-        container.innerHTML = `<p class="text-center text-slate-500 py-12">해당 과목/조건에 등록된 문제가 아직 없습니다.<br>questions.json 파일에 문제를 추가해보세요!</p>`;
-        return;
-      }
-
-      list.forEach(q => {
-        const card = document.createElement('div');
-        card.className = "bg-slate-800/60 border border-slate-700/80 rounded-xl p-5 space-y-3";
-        card.innerHTML = `
-          <div class="flex justify-between items-center text-xs">
-            <span class="bg-slate-700 text-slate-300 px-2.5 py-1 rounded font-medium">${q.major} > ${q.subject} · ${q.year}년</span>
-            <span class="text-amber-400 font-medium">★ 출제 빈도: ${q.count}회</span>
-          </div>
-          <p class="font-bold text-slate-100 leading-relaxed text-base">Q. ${q.question}</p>
-          
-          <button onclick="toggleAnswer(${q.id})" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 py-1">
-            <i data-lucide="eye" class="w-3.5 h-3.5"></i> 정답 및 모범답안 보기
-          </button>
-
-          <div id="ans-${q.id}" class="hidden bg-slate-900/90 p-4 rounded-lg border border-slate-700/50 text-sm text-slate-300 whitespace-pre-line leading-relaxed">
-            <strong class="text-emerald-400 block mb-1">[모범 답안]</strong>
-            ${q.answer}
-          </div>
-
-          <div class="flex gap-2 pt-2 border-t border-slate-700/50">
-            <button onclick="markStatus(${q.id}, 'correct')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs py-2 rounded-lg font-medium transition">
-              정답 (맞힘)
-            </button>
-            <button onclick="markStatus(${q.id}, 'wrong')" class="flex-1 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 text-xs py-2 rounded-lg font-medium transition">
-              오답 (틀림)
-            </button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-
-      lucide.createIcons();
-    }
-
-    function toggleAnswer(id) {
-      const el = document.getElementById(`ans-${id}`);
-      el.classList.toggle('hidden');
-    }
-
-    function markStatus(id, type) {
-      if (!solvedIds.includes(id)) solvedIds.push(id);
-
-      if (type === 'wrong' && !wrongIds.includes(id)) {
-        wrongIds.push(id);
-      } else if (type === 'correct') {
-        wrongIds = wrongIds.filter(item => item !== id);
-      }
-
-      localStorage.setItem('solved_ids', JSON.stringify(solvedIds));
-      localStorage.setItem('wrong_ids', JSON.stringify(wrongIds));
-
-      updateDashboardCounts();
-      alert(type === 'correct' ? '맞힌 문제로 기록되었습니다!' : '오답노트에 추가되었습니다.');
-    }
-
-    function resetData() {
-      if (confirm('모든 문제 풀이 및 오답 기록을 초기화하시겠습니까?')) {
-        localStorage.clear();
-        solvedIds = [];
-        wrongIds = [];
-        updateDashboardCounts();
-        showDashboard();
-      }
-    }
-
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const val = e.target.value.trim().toLowerCase();
-      if (!val) {
-        showDashboard();
-        return;
-      }
-      const filtered = questions.filter(q => 
-        q.question.toLowerCase().includes(val) || 
-        q.answer.toLowerCase().includes(val) ||
-        q.subject.toLowerCase().includes(val) ||
-        (q.keywords && q.keywords.some(k => k.toLowerCase().includes(val)))
-      );
-      renderQuestions(filtered, `'${val}' 검색 결과`);
-    });
   </script>
 </body>
 </html>
